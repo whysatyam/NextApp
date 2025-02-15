@@ -18,7 +18,7 @@ export default function ExportAsset({ resource }: { resource: string }) {
   const [selected, setSelected] = useState("original");
 
   useEffect(() => {
-    if (typeof window === "undefined") return; // Ensure it's client-side
+    if (typeof window === "undefined") return;
   }, []);
 
   const handleDownload = async () => {
@@ -29,17 +29,18 @@ export default function ExportAsset({ resource }: { resource: string }) {
         `/api/download?publicId=${activeLayer.publicId}&quality=${selected}&resource_type=${activeLayer.resourceType}&format=${activeLayer.format}&url=${activeLayer.url}`
       );
       if (!res.ok) throw new Error("Failed to fetch image URL");
-
+  
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-
+  
       const imageResponse = await fetch(data.url);
       if (!imageResponse.ok) throw new Error("Failed to fetch image");
-
+  
       const imageBlob = await imageResponse.blob();
       const downloadUrl = URL.createObjectURL(imageBlob);
-
-      if (typeof window !== "undefined") {
+  
+      
+      if (typeof window !== "undefined" && typeof document !== "undefined") {
         const link = document.createElement("a");
         link.href = downloadUrl;
         link.download = data.filename;
@@ -47,12 +48,13 @@ export default function ExportAsset({ resource }: { resource: string }) {
         link.click();
         document.body.removeChild(link);
       }
-
+  
       URL.revokeObjectURL(downloadUrl);
     } catch (error) {
       console.error("Download failed:", error);
     }
   };
+  
 
   return (
     <Dialog>
